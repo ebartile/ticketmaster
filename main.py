@@ -352,7 +352,7 @@ if __name__ == '__main__':
                 'embed': ['area', 'offer', 'description'],
                 'apikey': 'b462oi7fic6pehcdkzony5bxhe',
                 'apisecret': 'pquzpfrfz7zd2ylvtz3w5dtyse',
-                'limit': 100,
+                'limit': 500,
                 'offset': 0,
                 'sort': '-listprice',
             }
