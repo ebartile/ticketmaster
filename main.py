@@ -278,6 +278,10 @@ def remove_embedded_field(data):
     return data
 
 if __name__ == '__main__':
+    includeResale = True
+    includeStandard = False
+    includePlatinumInventoryType = False
+    qty = 1
     eventUrl = "https://www.ticketmaster.com/travis-scott-utopia-tour-presents-circus-charlotte-north-carolina-10-11-2023/event/2D005F05828C17F1"
     # Define a regular expression pattern to extract the event ID
     pattern = r"/event/([A-Z0-9]+)$"
@@ -340,11 +344,11 @@ if __name__ == '__main__':
             top_picks_q_params = {
                 'show': 'places maxQuantity sections',
                 'mode': 'primary:ppsectionrow+resale:ga_areas+platinum:all',
-                'qty': "1",
+                'qty': qty,
                 'q': "not('accessible')",
-                'includeStandard': 'False',
-                'includeResale': 'True',
-                'includePlatinumInventoryType': 'False',
+                'includeStandard': includeStandard,
+                'includeResale': includeResale,
+                'includePlatinumInventoryType': includePlatinumInventoryType,
                 'embed': ['area', 'offer', 'description'],
                 'apikey': 'b462oi7fic6pehcdkzony5bxhe',
                 'apisecret': 'pquzpfrfz7zd2ylvtz3w5dtyse',
