@@ -278,7 +278,6 @@ def remove_embedded_field(data):
     return data
 
 if __name__ == '__main__':
-    eventTitle = "Travis Scott Utopia Tour Presents Circus Maximus"
     eventUrl = "https://www.ticketmaster.com/travis-scott-utopia-tour-presents-circus-charlotte-north-carolina-10-11-2023/event/2D005F05828C17F1"
     # Define a regular expression pattern to extract the event ID
     pattern = r"/event/([A-Z0-9]+)$"
