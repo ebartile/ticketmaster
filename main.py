@@ -12,6 +12,7 @@ import time
 from dateutil import parser
 from dateutil.tz import tzutc
 from threading import Semaphore
+from bs4 import BeautifulSoup
 
 webhook_url = "https://discord.com/api/webhooks/1160359055890595840/vAphnpPlgEfCtb2bg0XINqlfrnq-6D_FPSgq-lUpjks-NfFugVoTtL6_ieP2ipgS4E2J"
 
@@ -25,13 +26,6 @@ def getReese84Token()->tuple[str, int]:
     # fetch the javascript that generates the reese84
     antibot_js_code_loc = os.path.join(os.path.dirname(__file__), "js/epsf.js")
     antibot_js_code_trim = readFileContentToString(antibot_js_code_loc)
-
-    # # trim the code to the function that is only used
-    # match_obj = re.search(constants.FN_MATCHING_REGEX, antibot_js_code_full)
-    # if not match_obj:
-    #     raise Exception('reese84 manufacture fails')
-    # start, end = match_obj.span()
-    # antibot_js_code_trim = antibot_js_code_full[start:end]
 
     # inject the code to the javascript
     injector_js_code_loc = os.path.join(
@@ -116,13 +110,27 @@ class Reese84TokenUpdating():
         self.initialize_reese84_token()
         self.scheduler.run()
 
-def send_discord_webhook(payload):
-    # Convert the payload to JSON
-    json_payload = json.dumps(payload)
-    # Send a POST request to the Discord webhook URL
-    response = requests.post(webhook_url, data=json_payload, headers={"Content-Type": "application/json"})
-    # Print the response from the server (optional)
-    print(response.text)
+def send_discord_webhook(payloads):
+    # Delay between messages (in seconds)
+    delay_between_messages = 2
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'MTE2MDg3OTkzMTUxMzkxNzQ1MQ.GTaFBZ.bDdWV-Ejvfj_OXKHNKyQSNw5pT2VzO9F5iWU1Y'
+    }
+
+    for payload in payloads:
+
+        response = requests.post(webhook_url, json=payload, headers=headers)
+
+        # Check for rate limit exceeded
+        if response.status_code == 429:
+            retry_after = int(response.headers['Retry-After'])
+            print(f"Rate limit exceeded. Waiting for {retry_after} seconds.")
+            time.sleep(retry_after)
+        elif response.status_code != 204:  # 204 means success without content
+            print(f"Failed to send message. Status code: {response.status_code}")
+
+        time.sleep(delay_between_messages)
 
 
 def format_seats(data):
@@ -271,12 +279,61 @@ def remove_embedded_field(data):
 
 if __name__ == '__main__':
     eventTitle = "Travis Scott Utopia Tour Presents Circus Maximus"
-    eventId = "2D005F05828C17F1"
+    eventUrl = "https://www.ticketmaster.com/travis-scott-utopia-tour-presents-circus-charlotte-north-carolina-10-11-2023/event/2D005F05828C17F1"
+    # Define a regular expression pattern to extract the event ID
+    pattern = r"/event/([A-Z0-9]+)$"
+
+    # Use re.search to find the match in the URL
+    match = re.search(pattern, eventUrl)
+
+    if match:
+        eventId = match.group(1)
+        print("Event ID:", eventId)
+    else:
+        print("Event ID not found in the URL")
+        exit()
 
     # reese84 token renewing thread
     reese_token_gen = Reese84TokenUpdating()
     serverThread_reese = threading.Thread(target=reese_token_gen.start)
     serverThread_reese.start()
+
+    eventinfo = True
+    while eventinfo:
+        try:
+            # # Sending request to protected url 
+            response = requests.get(
+                url='https://proxy.scrapeops.io/v1/',
+                params={
+                    'api_key': '89ad59bd-3157-4945-99ed-0604c4d42801',
+                    'url': eventUrl, 
+                    'bypass': 'perimeterx' 
+                },
+            )
+            # Print response details
+            # print(f"Response URL: {response.url}")
+            print(f"Status Code: {response.status_code}")
+            # print(f"Content: {response.text}")
+            if response.status_code != 200:
+                time.sleep(10)        
+            else:
+                # Parse the HTML content using BeautifulSoup
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                # Extract the title tag content
+                title_tag = soup.title
+
+                if title_tag is not None:
+                    # Get the text inside the title tag
+                    eventTitle = title_tag.get_text(strip=True)
+                    print("Title:", eventTitle)
+                    eventinfo = False
+                else:
+                    print("Title tag not found on the page.")
+
+        except Exception:
+            time.sleep(10)        
+        
 
     while True:
         try:
@@ -427,7 +484,7 @@ if __name__ == '__main__':
                     })
 
             if len(messages) > 0:
-                send_discord_webhook({"messages": messages})
+                send_discord_webhook(messages)
                 print("Sent Update Successfully")
                 
             print("Checking will resume after 30 seconds...")
