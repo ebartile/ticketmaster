@@ -1,23 +1,8 @@
 # Ticketmaster
 
-This project utilizes both JavaScript and Python to interact with Ticketmaster's services. To run the application, follow these steps:
+This project utilizes Python to interact with Ticketmaster's services. To run the application, follow these steps:
 
-1. Navigate to the `js` directory using the command line:
-    ```bash
-    cd js
-    ```
-
-2. Install the necessary dependencies using Yarn:
-    ```bash
-    yarn -cwd .
-    ```
-
-3. Return to the main project directory:
-    ```bash
-    cd ..
-    ```
-
-4. Run the Python script to execute the main application:
+1. Run the Python script to execute the main application:
     ```bash
     python3 main.py
     ```
