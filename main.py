@@ -249,7 +249,11 @@ def send_discord_webhook(event_id, scraped_data):
     conn.close()    
 
 def get_ticketmaster_data(event_id, scraped_data):
-    url = f"https://services.ticketmaster.com/api/ismds/event/{event_id}/facets?by=shape+attributes+available+accessibility+offer+placeGroups+inventoryType+offerType+description&show=places&embed=description&q=available&compress=places&resaleChannelId=internal.ecommerce.consumer.desktop.web.browser.ticketmaster.us&apikey=b462oi7fic6pehcdkzony5bxhe&apisecret=pquzpfrfz7zd2ylvtz3w5dtyse&embed=offer"
+    # q = 'and(available,inventorytypes:"resale")' # resale
+    # q = 'and(available,inventorytypes:"primary")' # standard
+    q = 'available' #all
+
+    url = f"https://services.ticketmaster.com/api/ismds/event/{event_id}/facets?by=shape+attributes+available+accessibility+offer+placeGroups+inventoryType+offerType+description&show=places&embed=description&q={q}&compress=places&resaleChannelId=internal.ecommerce.consumer.desktop.web.browser.ticketmaster.us&apikey=b462oi7fic6pehcdkzony5bxhe&apisecret=pquzpfrfz7zd2ylvtz3w5dtyse&embed=offer"
     payload = {}
     headers = {
         'c-reese84': '3:8hHwF7w9eimSR86uN6lrLQ==:bZyC8E+nG8kbBhdFgXbOcurOmRQjHnmulKJy7e+TKv6zHDscC2ebiNHEQnkq0AA8ehJovjbXdgy485le82xqaeKnFD/Tm3DMZ4qcNQTMuKiG4er6BbjfWJHreQUM2E56/oGJv0mKX9FqlwyYvN9/BcS3X/KNxxfLdkgh49oXRpcKWSlHM5S+TqwFXRuLm8VKNU7ApYp63Be4yY/c/+0LkwWIkO++brK6eNlOeFziSOwFAg1qbpqQoBDiv6qeTYTITXdV+fOBttHg4XznHTdBcVFjZBGYE1iEMCBulrqnq5OnyVJGEDO3vVQyknjQQ4erCAj7u3anDpkdnRo/4qwhocZv0ApejOf5zQz69KyW+UIpVsRR7OXPr4lQ5BEzU1ZOEPdJr62R42qE/7e14uy3K90HZ/Arx+0lni9OVQq728Y9cegXYtEHTqXGNvDwLuWzPP4Mn8hejql/cTNFRwfb0A==:1ACSOfGUAjPbCl+9Ml5+frVnTAEkgeoUWLcApzxfyfM=',
@@ -264,11 +268,12 @@ def get_ticketmaster_data(event_id, scraped_data):
             create_database()
             update_database(response.json())
             send_discord_webhook(event_id, scraped_data)
+            print(f"Event ID: {event_id} - Success")
         except json.JSONDecodeError:
             print(f"Event ID: {event_id} - Error decoding JSON!")
     else:
         # print(f"Event ID: {event_id} - Status code: {response.status_code}")
-        print(f"Event ID: {event_id} - Status code: {response.status_code}")
+        print(f"Event ID: {event_id} - Status code: {response.text}")
 
 event_ids = load_event_ids()
 scraped_data_dict = {event_id: scrape_data_from_url(event_id) for event_id in event_ids}
