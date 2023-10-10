@@ -271,8 +271,7 @@ def get_ticketmaster_data(event_id, scraped_data):
         print(f"Event ID: {event_id} - Status code: {response.status_code}")
 
 event_ids = load_event_ids()
-# scraped_data_dict = {event_id: scrape_data_from_url(event_id) for event_id in event_ids}
-scraped_data_dict = {'2D005F05828C17F1': {'event_date': 'Wed • Oct 11 • 8:00 PM', 'title': 'Travis Scott Utopia Tour Presents Circus Maximus Tickets Oct 11, 2023 Charlotte, NC | Ticketmaster', 'link': 'https://www.ticketmaster.com/travis-scott-utopia-tour-presents-circus-charlotte-north-carolina-10-11-2023/event/2D005F05828C17F1'}}
+scraped_data_dict = {event_id: scrape_data_from_url(event_id) for event_id in event_ids}
 
 while True:
     for event_id in event_ids:
